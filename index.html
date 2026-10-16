@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripCraft - Global Travel Route & Cost Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        accent: {
+                            500: '#ff6b6b',
+                            600: '#ee5253',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, rgba(17, 94, 89, 0.94) 0%, rgba(13, 148, 136, 0.88) 100%), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #0d9488;
+            border-radius: 10px;
+        }
+        @media print {
+            nav, header, #github-deploy-banner, button, .no-print {
+                display: none !important;
+            }
+            #cart-panel {
+                position: static !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md">
+                        <i class="fa-solid fa-earth-americas text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-2xl bg-gradient-to-r from-brand-800 to-brand-500 bg-clip-text text-transparent">TripCraft</span>
+                        <span class="hidden sm:inline-block ml-2 text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-2.5 py-0.5 rounded-full">120+ Sights & 20 Cities</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6 text-sm">
+                    <a href="#destination-picker" class="text-slate-600 hover:text-brand-600 font-medium transition">Destinations</a>
+                    <a href="#transport-section" class="text-slate-600 hover:text-brand-600 font-medium transition">Transport</a>
+                    <a href="#attractions-section" class="text-slate-600 hover:text-brand-600 font-medium transition">Tourist Spots</a>
+                    <a href="#budget-calculator-section" class="text-slate-600 hover:text-brand-600 font-medium transition">Trip Budget</a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openGitHubModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-3 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-brands fa-github text-sm"></i>
+                        <span class="hidden sm:inline">Host on GitHub</span>
+                    </button>
+                    <button onclick="toggleCartDrawer()" class="relative bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 border border-brand-200 shadow-sm">
+                        <i class="fa-solid fa-suitcase text-lg"></i>
+                        <span class="hidden sm:inline">Saved Trip</span>
+                        <span id="cart-count" class="bg-accent-500 text-white text-xs font-extrabold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="github-deploy-banner" class="bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 text-white py-2.5 px-4 border-b border-brand-700/40">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-xs gap-2">
+            <div class="flex items-center gap-2">
+                <span class="bg-brand-500 text-slate-950 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">6-8+ Spots Per City</span>
+                <span>Expanded catalog featuring over 120 detailed attractions with prices in R$.</span>
+            </div>
+            <button onclick="openGitHubModal()" class="underline font-bold text-teal-300 hover:text-white transition">
+                Deployment Guide <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+        </div>
+    </div>
+
+    <header class="gradient-hero text-white py-12 px-4 sm:px-6 lg:px-8 shadow-inner relative">
+        <div class="max-w-5xl mx-auto space-y-6">
+            
+            <div class="text-center space-y-3">
+                <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md text-white text-xs font-bold px-4 py-1.5 rounded-full border border-white/30">
+                    <i class="fa-solid fa-compass text-amber-300"></i> Expanded Sights & Tourist Attractions (All in R$)
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                    Explore 6 to 8+ Top Attractions Per City
+                </h1>
+                <p class="text-base sm:text-lg text-teal-100 max-w-2xl mx-auto font-light">
+                    Select from 20 world destinations and discover a deep catalog of landmarks, free spots, ticket prices in BRL, and insider tips.
+                </p>
+            </div>
+
+            <div id="destination-picker" class="bg-white text-slate-800 p-5 sm:p-7 rounded-3xl shadow-2xl border border-slate-100 space-y-5">
+                
+                <div class="flex flex-col md:flex-row gap-3 items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="relative w-full md:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        <input id="search-input" type="text" placeholder="Search city or landmark..." oninput="handleSearch()" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-bold focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <!-- Region Filter Pills -->
+                    <div class="flex flex-wrap gap-1.5 w-full md:w-auto">
+                        <button onclick="setRegionFilter('all')" class="filter-btn active text-xs font-bold px-3 py-1.5 rounded-xl border bg-brand-600 text-white border-brand-600" data-region="all">All (20)</button>
+                        <button onclick="setRegionFilter('brazil')" class="filter-btn text-xs font-bold px-3 py-1.5 rounded-xl border bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200" data-region="brazil">Brazil (8)</button>
+                        <button onclick="setRegionFilter('europe')" class="filter-btn text-xs font-bold px-3 py-1.5 rounded-xl border bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200" data-region="europe">Europe (5)</button>
+                        <button onclick="setRegionFilter('americas')" class="filter-btn text-xs font-bold px-3 py-1.5 rounded-xl border bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200" data-region="americas">Americas (4)</button>
+                        <button onclick="setRegionFilter('asia-africa')" class="filter-btn text-xs font-bold px-3 py-1.5 rounded-xl border bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200" data-region="asia-africa">Asia & Africa (3)</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                <i class="fa-solid fa-house-user text-brand-600"></i> Departure Location (Origin)
+                            </label>
+                            <button onclick="detectUserLocation()" class="text-[11px] font-bold text-brand-700 hover:text-brand-800 flex items-center gap-1 bg-brand-100 hover:bg-brand-200 px-2 py-0.5 rounded-md transition">
+                                <i class="fa-solid fa-location-arrow"></i> Detect GPS
+                            </button>
+                        </div>
+                        <input id="user-origin" type="text" value="Lajeado, RS, Brazil" onchange="updateOriginLabels()" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 text-sm">
+                        <span id="origin-badge" class="text-[11px] text-slate-500 mt-1 block">
+                            <i class="fa-solid fa-circle-check text-emerald-500"></i> Active Origin: <strong id="origin-display-text">Lajeado - RS, Brazil (POA Airport ~115km)</strong>
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                            <i class="fa-solid fa-plane-arrival text-brand-600"></i> Select Destination City
+                        </label>
+                        <select id="select-destination" onchange="onDestinationChange()" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 text-sm">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                        <span id="destination-info" class="text-[11px] text-slate-500 mt-1 block">
+                            Distance metrics and attraction prices updated in R$.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="bg-gradient-to-r from-brand-900 to-teal-800 text-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-amber-300 text-xl font-bold">
+                            <i class="fa-solid fa-route"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-teal-200 block">Active Route Distance</span>
+                            <span id="dist-display" class="text-lg font-extrabold text-white">1.120 km (Lajeado ➔ Rio de Janeiro)</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-teal-100">Flight Duration: <strong id="flight-duration-display" class="text-amber-300">2h 00m (via POA)</strong></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-14 flex-grow">
+
+        <section id="transport-section" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-2 border-b border-slate-200 pb-4">
+                <div>
+                    <span class="text-brand-700 font-bold uppercase tracking-wider text-xs">Transportation Options</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">1. Transport Costs from Origin (in BRL)</h2>
+                </div>
+                <p class="text-slate-500 text-sm max-w-md">
+                    Estimated round-trip rates per passenger departing from <strong class="text-slate-800" id="current-origin-label">Lajeado, RS</strong>.
+                </p>
+            </div>
+
+            <div id="transport-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- JS Populated -->
+            </div>
+        </section>
+
+        <section id="attractions-section" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-brand-700 font-bold uppercase tracking-wider text-xs">Tourist Spots & Attractions</span>
+                        <span id="spots-count-badge" class="bg-brand-100 text-brand-800 text-[11px] font-extrabold px-2 py-0.5 rounded-md">
+                            8 Tourist Spots Available
+                        </span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                        2. Attractions in <span id="active-city-title" class="text-brand-700">Rio de Janeiro</span>
+                    </h2>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="relative w-48 sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input id="spot-search" type="text" placeholder="Filter this city's spots..." oninput="renderAttractions()" class="w-full bg-white border border-slate-300 rounded-xl pl-8 pr-3 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <select id="filter-price-type" onchange="renderAttractions()" class="bg-white border border-slate-300 text-xs font-bold rounded-xl px-3 py-1.5 text-slate-700 focus:ring-brand-500">
+                        <option value="all">All Prices</option>
+                        <option value="free">Free Attractions (R$ 0,00)</option>
+                        <option value="budget">Budget Friendly (&le; R$ 100,00)</option>
+                        <option value="premium">Premium Sights (&gt; R$ 100,00)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dynamic Attractions Grid -->
+            <div id="attractions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- JS Populated with 6-8+ items per city -->
+            </div>
+        </section>
+
+        <section id="budget-calculator-section" class="bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-slate-800">
+            <div class="max-w-4xl space-y-6">
+                <div class="inline-flex items-center gap-2 bg-brand-500/20 text-brand-300 text-xs font-bold px-3 py-1 rounded-full border border-brand-500/30">
+                    <i class="fa-solid fa-calculator"></i> Live Travel Estimator (in BRL)
+                </div>
+
+                <div>
+                    <h2 class="text-3xl font-extrabold">3. Complete Trip Budget Calculator</h2>
+                    <p class="text-slate-300 text-sm mt-1">
+                        Adjust stay length and hotel tiers to compute complete trip expenses departing from <span class="text-amber-300 font-bold" id="calc-origin-name">Lajeado, RS</span>.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-slate-300 mb-1">Stay Duration (Days)</label>
+                        <input id="trip-days" type="number" min="1" max="30" value="5" onchange="recalculateTripTotal()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold focus:ring-brand-500">
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-slate-300 mb-1">Accommodation Tier / Night</label>
+                        <select id="hotel-rate" onchange="recalculateTripTotal()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold focus:ring-brand-500">
+                            <option value="150">Hostel / Budget (R$ 150,00)</option>
+                            <option value="400" selected>3-Star Standard Hotel (R$ 400,00)</option>
+                            <option value="900">Luxury Hotel / Resort (R$ 900,00)</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-slate-300 mb-1">Daily Meal Estimate</label>
+                        <select id="food-rate" onchange="recalculateTripTotal()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold focus:ring-brand-500">
+                            <option value="100">Street Food & Buffets (R$ 100,00)</option>
+                            <option value="220" selected>Casual Restaurants (R$ 220,00)</option>
+                            <option value="450">Fine Dining (R$ 450,00)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-teal-900 to-brand-900 border border-teal-700/50 p-6 rounded-2xl space-y-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center border-b border-teal-800/80 pb-4">
+                        <div>
+                            <span class="text-[11px] text-teal-200 block">Selected Transport</span>
+                            <span id="summary-transport" class="text-base font-extrabold text-white">R$ 0,00</span>
+                        </div>
+                        <div>
+                            <span class="text-[11px] text-teal-200 block">Attraction Tickets</span>
+                            <span id="summary-attractions" class="text-base font-extrabold text-white">R$ 0,00</span>
+                        </div>
+                        <div>
+                            <span class="text-[11px] text-teal-200 block">Total Hotel Stay</span>
+                            <span id="summary-hotel" class="text-base font-extrabold text-white">R$ 0,00</span>
+                        </div>
+                        <div>
+                            <span class="text-[11px] text-teal-200 block">Total Food Cost</span>
+                            <span id="summary-food" class="text-base font-extrabold text-white">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                        <div>
+                            <span class="text-xs text-teal-200 font-semibold block">TOTAL ESTIMATED TRIP BUDGET:</span>
+                            <span id="calc-grand-total" class="text-3xl font-extrabold text-amber-300">R$ 0,00</span>
+                        </div>
+                        <button onclick="toggleCartDrawer(true)" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-lg"></i> View Full Itinerary
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="cart-drawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 transition-opacity opacity-0 pointer-events-none">
+        <div id="cart-panel" class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform transform translate-x-full flex flex-col">
+            
+            <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-route text-brand-400 text-xl"></i>
+                    <div>
+                        <h3 class="font-bold text-base">Your Travel Summary</h3>
+                        <span id="drawer-origin-subtitle" class="text-[11px] text-slate-400">Origin: Lajeado, RS</span>
+                    </div>
+                </div>
+                <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 bg-slate-50 border-b border-slate-200 space-y-3">
+                <h4 class="font-bold text-xs uppercase text-slate-500">Selected Transport from Origin</h4>
+                <div id="drawer-transport-item" class="bg-white p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+
+            <div class="p-4 bg-white font-bold text-xs text-slate-500 uppercase border-b border-slate-100 flex justify-between">
+                <span>Selected Sight Tickets (<span id="cart-item-count">0</span>)</span>
+                <button onclick="clearCartAttractions()" class="text-accent-600 font-bold hover:underline">Clear Sights</button>
+            </div>
+
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto space-y-3 custom-scrollbar">
+                <!-- Dynamic Items -->
+            </div>
+
+            <div class="p-6 bg-slate-50 border-t border-slate-200 space-y-3">
+                <div class="space-y-1.5 text-xs text-slate-600">
+                    <div class="flex justify-between">
+                        <span>Round-Trip Transport:</span>
+                        <span id="drawer-cost-transport" class="font-bold text-slate-800">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Selected Sights:</span>
+                        <span id="drawer-cost-attractions" class="font-bold text-slate-800">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Hotel & Meals Total:</span>
+                        <span id="drawer-cost-stay" class="font-bold text-slate-800">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+                        <span>GRAND TOTAL:</span>
+                        <span id="drawer-cost-total" class="text-brand-700 text-xl">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button onclick="copyItineraryToClipboard()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-copy"></i> Copy Summary
+                    </button>
+                    <button onclick="downloadJSON()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-download"></i> Download JSON
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="github-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-6">
+            <button onclick="closeGitHubModal()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-800 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-900">How to Publish on GitHub Pages</h3>
+                    <p class="text-xs text-slate-500">Host this entire travel planner online for free in under 2 minutes.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-700 border-t border-slate-100 pt-4">
+                <div class="flex gap-3 items-start">
+                    <span class="w-6 h-6 bg-brand-100 text-brand-800 rounded-full flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                    <div>
+                        <strong class="text-slate-900">Create a new repository on GitHub</strong>
+                        <p class="text-xs text-slate-500 mt-0.5">Go to <a href="https://github.com/new" target="_blank" class="text-brand-600 underline">github.com/new</a> and name your repository (e.g., <code>tripcraft-planner</code>).</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start">
+                    <span class="w-6 h-6 bg-brand-100 text-brand-800 rounded-full flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                    <div>
+                        <strong class="text-slate-900">Upload this file as <code>index.html</code></strong>
+                        <p class="text-xs text-slate-500 mt-0.5">Save this webpage file as <code>index.html</code> and upload it directly to the root directory of your repository.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start">
+                    <span class="w-6 h-6 bg-brand-100 text-brand-800 rounded-full flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                    <div>
+                        <strong class="text-slate-900">Enable GitHub Pages</strong>
+                        <p class="text-xs text-slate-500 mt-0.5">In your repo, navigate to <strong>Settings</strong> ➔ <strong>Pages</strong>. Under <em>Build and deployment</em>, set Source to <strong>Deploy from a branch</strong>, pick the <code>main</code> branch, and click <strong>Save</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeGitHubModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition text-sm">
+                Got it, close guide!
+            </button>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="text-sm font-medium">&copy; 2026 TripCraft - Expanded Global Travel Route & Cost Estimator.</p>
+            <p class="text-xs text-slate-500">Featuring 20 destinations with 6-8+ tourist spots each. All prices in BRL (R$).</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentOrigin = "Lajeado, RS, Brazil";
+        let selectedDestinationKey = "Rio de Janeiro";
+        let selectedTransportIndex = 0; 
+        let activeRegionFilter = "all";
+        let searchQuery = "";
+
+        function formatBRL(amount) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+        }
+
+        // Comprehensive Dataset: Every city has 6-8+ iconic attractions
+        const destinationsData = {
+            // --- BRAZIL ---
+            "Rio de Janeiro": {
+                name: "Rio de Janeiro (Brazil)",
+                region: "brazil",
+                distanceKm: 1120,
+                flightDuration: "2h 00m (via POA)",
+                transports: [
+                    { type: "Flight (Round-Trip)", price: 720.00, details: "Departing POA airport (~115km from Lajeado). Direct flight.", icon: "fa-plane" },
+                    { type: "Interstate Bus", price: 340.00, details: "Departs from Lajeado terminal or POA (~22h journey).", icon: "fa-bus" },
+                    { type: "Personal Car", price: 1150.00, details: "1,120 km route. Gas (~102L) + highway tolls (Round-trip).", icon: "fa-car" }
+                ],
+                attractions: [
+                    { id: 101, name: "Christ the Redeemer & Corcovado", price: 97.50, priceTag: "R$ 97,50", rating: 4.9, image: "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?auto=format&fit=crop&w=800&q=80", tip: "Take the 8:00 AM cog train to avoid large crowds.", desc: "Iconic statue of Jesus Christ and one of the New 7 Wonders of the World." },
+                    { id: 102, name: "Copacabana & Ipanema Beaches", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Unmissable sunset views at Arpoador Rock.", desc: "World-famous golden sand beaches with vibrant boardwalks." },
+                    { id: 103, name: "Sugarloaf Mountain (Pão de Açúcar)", price: 150.00, priceTag: "R$ 150,00", rating: 4.8, image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=800&q=80", tip: "Buy online in advance to save 10% on ticket prices.", desc: "Cable car ride providing panoramic views of Guanabara Bay." },
+                    { id: 104, name: "Parque Lage & Botanical Garden", price: 67.00, priceTag: "R$ 67,00", rating: 4.8, image: "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?auto=format&fit=crop&w=800&q=80", tip: "Great spot for breakfast surrounded by rainforest inside Parque Lage.", desc: "Historic mansion set within Tijuca Forest and imperial palms." },
+                    { id: 105, name: "Selarón Steps (Escadaria Selarón)", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Located between Lapa and Santa Teresa; visit during daylight hours.", desc: "World-famous vibrant tile stairway created by artist Jorge Selarón." },
+                    { id: 106, name: "Maracanã Stadium Official Tour", price: 75.00, priceTag: "R$ 75,00", rating: 4.8, image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80", tip: "Walk through the locker rooms, tunnel, and press hall.", desc: "One of football's most legendary stadiums in world history." },
+                    { id: 107, name: "Museum of Tomorrow (Museu do Amanhã)", price: 30.00, priceTag: "R$ 30,00", rating: 4.7, image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80", tip: "Free entrance on Tuesdays; buy tickets online.", desc: "Futuristic science museum designed by Santiago Calatrava on Mauá Pier." },
+                    { id: 108, name: "Tijuca National Park & Vista Chinesa", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", tip: "Taxi or bike up to Vista Chinesa gazebo for breathtaking jungle views.", desc: "One of the largest urban rainforests in the world." }
+                ]
+            },
+            "Gramado": {
+                name: "Gramado & Canela (Brazil)",
+                region: "brazil",
+                distanceKm: 110,
+                flightDuration: "N/A (Drive via RS-115 / RS-235)",
+                transports: [
+                    { type: "Personal Car", price: 110.00, details: "Direct drive (~1h 45m). Gas (~10L) + toll.", icon: "fa-car" },
+                    { type: "Intercity Bus", price: 65.00, details: "Daily direct buses departing Lajeado bus station.", icon: "fa-bus" }
+                ],
+                attractions: [
+                    { id: 201, name: "Lago Negro (Black Lake)", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Rent a paddle boat for R$ 40 or walk around the lake freely.", desc: "Pine-surrounded lake imported directly from Germany's Black Forest." },
+                    { id: 202, name: "Caracol Waterfall & Cable Cars", price: 90.00, priceTag: "R$ 90,00", rating: 4.7, image: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=800&q=80", tip: "Visit during sunny mornings for rainbow views over the falls.", desc: "130-meter waterfall with glass-floor observation deck." },
+                    { id: 203, name: "Snowland Indoor Snow Park", price: 199.00, priceTag: "R$ 199,00", rating: 4.6, image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80", tip: "Thermal clothes rental included with admission ticket.", desc: "First indoor snow park in the Americas with real skiing and tubing." },
+                    { id: 204, name: "Rua Torta & Covered Street", price: 0, priceTag: "FREE", rating: 4.6, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Perfect for evening walks, cafes, and chocolate sampling.", desc: "Famous winding flower-lined street inspired by Lombard Street." },
+                    { id: 205, name: "Mini Mundo Park", price: 86.00, priceTag: "R$ 86,00", rating: 4.8, image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80", tip: "Includes over 200 miniature replicas of world castles and railways.", desc: "Open-air miniature park with intricate working trains and buildings." },
+                    { id: 206, name: "Stone Cathedral (Catedral de Pedra - Canela)", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Watch the nightly synchronized light show at 8:00 PM.", desc: "Gothic cathedral lined with basalt stones in central Canela." },
+                    { id: 207, name: "Skyglass Canela Glass Platform", price: 130.00, priceTag: "R$ 130,00", rating: 4.8, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "Walk over the 35-meter glass platform suspended over Horseshoe Valley.", desc: "One of the longest glass platforms suspended over a canyon." }
+                ]
+            },
+            "Foz do Iguacu": {
+                name: "Foz do Iguaçu (Brazil)",
+                region: "brazil",
+                distanceKm: 620,
+                flightDuration: "1h 10m (POA direct)",
+                transports: [
+                    { type: "Direct Flight", price: 580.00, details: "Direct or quick layover flight from POA.", icon: "fa-plane" },
+                    { type: "Personal Car", price: 650.00, details: "620 km route via BR-386 and Parana highways.", icon: "fa-car" },
+                    { type: "Overnight Bus", price: 280.00, details: "Direct sleeper bus departing Lajeado/POA (~11h).", icon: "fa-bus" }
+                ],
+                attractions: [
+                    { id: 301, name: "Iguaçu National Park & Waterfalls", price: 91.00, priceTag: "R$ 91,00", rating: 4.9, image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80", tip: "Bring a waterproof jacket for the walkway close to Devil's Throat.", desc: "One of the 7 Natural Wonders of the World with 275 majestic falls." },
+                    { id: 302, name: "Parque das Aves (Bird Sanctuary)", price: 80.00, priceTag: "R$ 80,00", rating: 4.8, image: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80", tip: "Located right next to the Iguaçu Falls entrance.", desc: "Immersive sanctuary housing over 1,300 Atlantic Forest birds." },
+                    { id: 303, name: "Itaipu Dam Panoramic Tour", price: 58.00, priceTag: "R$ 58,00", rating: 4.7, image: "https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&w=800&q=80", tip: "Sunset tours offer incredible light over the spillway.", desc: "One of the largest hydroelectric clean-energy plants on Earth." },
+                    { id: 304, name: "Three Borders Landmark (Marco das Três Fronteiras)", price: 48.00, priceTag: "R$ 48,00", rating: 4.7, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Includes cultural dance performances representing Brazil, Argentina & Paraguay.", desc: "Meeting point of the Iguaçu and Paraná rivers where 3 nations meet." },
+                    { id: 305, name: "Macuco Safari Boat Adventure", price: 386.00, priceTag: "R$ 386,00", rating: 4.9, image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80", tip: "Pre-book dry bags for electronics; you will get completely soaked!", desc: "Thrilling twin-engine speed boat ride straight into the waterfall spray." },
+                    { id: 306, name: "Buddhist Temple Chen Yen", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80", tip: "Peaceful spot on high ground offering views of Ciudad del Este.", desc: "Over 120 Buddha statues set in quiet gardens." }
+                ]
+            },
+            "Florianopolis": {
+                name: "Florianópolis (Brazil)",
+                region: "brazil",
+                distanceKm: 480,
+                flightDuration: "1h 00m (POA)",
+                transports: [
+                    { type: "Personal Car", price: 480.00, details: "480 km drive along BR-101 highway (~6h).", icon: "fa-car" },
+                    { type: "Interstate Bus", price: 160.00, details: "Daily buses departing Lajeado or POA terminal.", icon: "fa-bus" },
+                    { type: "Flight (Round-Trip)", price: 490.00, details: "Flight departing POA airport.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 401, name: "Hercílio Luz Bridge Walkway", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Walk across at dusk for panoramic island lighting.", desc: "Longest suspension bridge in Brazil connecting island and mainland." },
+                    { id: 402, name: "Joaquina & Campeche Beaches", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Rent a sandboard at Joaquina dunes for R$ 30/hour.", desc: "World-class surfing beaches with crystal clear turquoise water." },
+                    { id: 403, name: "Santo Antônio de Lisboa Historic Village", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Top spot on the island for fresh oysters and sunset dining.", desc: "Azorean colonial fishing village with cobblestone sea promenades." },
+                    { id: 404, name: "Lagoa da Conceição Boat Ride", price: 25.00, priceTag: "R$ 25,00", rating: 4.7, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Take the boat to Costa da Lagoa for secluded waterfall seafood spots.", desc: "Vibrant saltwater lagoon in the heart of the island." },
+                    { id: 405, name: "Praia do Rosa & Lagoinha do Leste Trail", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", tip: "Wear hiking shoes for the 2-hour wilderness trail to Crown Rock.", desc: "Wild preserved beach surrounded by Atlantic Forest cliffs." },
+                    { id: 406, name: "Barra da Lagoa Natural Pools", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "20-minute easy walk across the footbridge from the main beach.", desc: "Calm emerald natural swimming pools between ocean granite rocks." }
+                ]
+            },
+            "Sao Paulo": {
+                name: "São Paulo (Brazil)",
+                region: "brazil",
+                distanceKm: 1100,
+                flightDuration: "1h 40m (POA to CGH/GRU)",
+                transports: [
+                    { type: "Domestic Flight", price: 480.00, details: "Frequent flights departing POA to Congonhas or Guarulhos.", icon: "fa-plane" },
+                    { type: "Interstate Bus", price: 290.00, details: "Overnight sleeper bus from Lajeado/POA (~18h).", icon: "fa-bus" }
+                ],
+                attractions: [
+                    { id: 501, name: "MASP (São Paulo Art Museum)", price: 60.00, priceTag: "R$ 60,00", rating: 4.8, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80", tip: "FREE admission every Tuesday all day long.", desc: "Landmark modern glass building with Latin America's finest art collection." },
+                    { id: 502, name: "Ibirapuera Park", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Rent a bicycle or visit the Japanese Pavilion inside.", desc: "Massive urban park with lakes, museums, and Oscar Niemeyer architecture." },
+                    { id: 503, name: "Avenida Paulista Sunday Walk", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Closed to cars every Sunday for street musicians and market stalls.", desc: "Cultural and financial heart of Brazil's largest metropolis." },
+                    { id: 504, name: "Beco do Batman Graffiti Alley", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80", tip: "Located in Vila Madalena; visit surrounding craft beer bars.", desc: "Open-air street art gallery continuously repainted by urban artists." },
+                    { id: 505, name: "Mercado Municipal (Mortadella & Pastel)", price: 0, priceTag: "FREE Entry", rating: 4.6, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", tip: "Try the giant mortadella sandwich (~R$ 45) and codfish pastel.", desc: "Historic market built in 1933 with stained glass dome windows." },
+                    { id: 506, name: "Sampa Sky Observation Decks", price: 100.00, priceTag: "R$ 100,00", rating: 4.7, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "Book specific time slots to stand over glass boxes 150m up.", desc: "Glass-bottom balconies extending over the 42nd floor of Mirante do Vale." }
+                ]
+            },
+            "Salvador": {
+                name: "Salvador (Brazil)",
+                region: "brazil",
+                distanceKm: 2780,
+                flightDuration: "3h 15m (POA)",
+                transports: [
+                    { type: "Domestic Flight", price: 890.00, details: "Departing POA airport. Round-trip ticket.", icon: "fa-plane" },
+                    { type: "Interstate Bus", price: 580.00, details: "Long distance journey (~42h with connections).", icon: "fa-bus" }
+                ],
+                attractions: [
+                    { id: 601, name: "Pelourinho Historic Center", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Catch Olodum drum rehearsals on Tuesday evenings.", desc: "Colorful colonial architecture and Afro-Brazilian culture." },
+                    { id: 602, name: "Farol da Barra Lighthouse & Sunset", price: 15.00, priceTag: "R$ 15,00", rating: 4.9, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Climb the lighthouse tower for panoramic ocean views.", desc: "17th-century fortress guarding the entrance to All Saints Bay." },
+                    { id: 603, name: "Elevador Lacerda & Mercado Modelo", price: 0.15, priceTag: "R$ 0,15", rating: 4.6, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Connects Upper Town (Pelourinho) to Lower Town market.", desc: "World's first urban art deco elevator built in 1873." },
+                    { id: 604, name: "Igreja de São Francisco (Golden Church)", price: 10.00, priceTag: "R$ 10,00", rating: 4.8, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Features over 1,000 kg of gold leaf interior leafing.", desc: "Peak example of Portuguese Baroque architecture in the Americas." },
+                    { id: 605, name: "Bonfim Church (Igreja do Bonfim)", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Tie a colorful wish ribbon (fita do Bonfim) on the iron gates.", desc: "Spiritual landmark famous for faith ribbons and annual washing rituals." },
+                    { id: 606, name: "Ponta da Humaitá Sunset Point", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "One of the quietest and most romantic sunset spots in Salvador.", desc: "Historic peninsula with lighthouse protruding into All Saints Bay." }
+                ]
+            },
+            "Recife": {
+                name: "Recife & Olinda (Brazil)",
+                region: "brazil",
+                distanceKm: 3100,
+                flightDuration: "3h 45m (POA)",
+                transports: [
+                    { type: "Domestic Flight", price: 980.00, details: "Flight departing POA to Recife airport (REC).", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 701, name: "Olinda Historic Center & Giant Puppets", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Walk up to Alto da Sé church for fresh coconut water.", desc: "UNESCO World Heritage hillside colonial city famous for Frevo culture." },
+                    { id: 702, name: "Brennand Sculpture Castle & Museum", price: 50.00, priceTag: "R$ 50,00", rating: 4.9, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", tip: "Set inside a Tudor castle surrounded by rainforest.", desc: "Unique museum housing ceramic art and medieval armor collections." },
+                    { id: 703, name: "Recife Antigo (Marco Zero Square)", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Take a R$ 10 boat ride across the estuary to Francisco Brennand Park.", desc: "Historic harbor square surrounded by colorful 19th century buildings." },
+                    { id: 704, name: "Boa Viagem Beach & Reef Promenade", price: 0, priceTag: "FREE", rating: 4.6, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Swim only inside natural reef barrier pools during low tide.", desc: "Urban oceanfront lined with natural coral reef barriers." },
+                    { id: 705, name: "Instituto Ricardo Brennand Armor Gallery", price: 50.00, priceTag: "R$ 50,00", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "Houses the largest private collection of weapons and armor in South America.", desc: "Gothic castle complex with sculpture gardens." },
+                    { id: 706, name: "Kahal Zur Israel Synagogue", price: 30.00, priceTag: "R$ 30,00", rating: 4.7, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Located in the heart of historic Recife Antigo.", desc: "First synagogue established in the entire Americas (1636)." }
+                ]
+            },
+            "Manaus": {
+                name: "Manaus - Amazon Rainforest (Brazil)",
+                region: "brazil",
+                distanceKm: 3400,
+                flightDuration: "5h 00m (POA via BSB/GRU)",
+                transports: [
+                    { type: "Flight (Round-Trip)", price: 1250.00, details: "Flight departing POA to Manaus (MAO).", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 801, name: "Meeting of the Waters Boat Tour", price: 180.00, priceTag: "R$ 180,00", rating: 4.9, image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80", tip: "Includes pink dolphin watching and floating village lunch.", desc: "Natural phenomenon where Rio Negro and Solimões rivers flow side-by-side without mixing." },
+                    { id: 802, name: "Amazon Theatre (Teatro Amazonas)", price: 20.00, priceTag: "R$ 20,00", rating: 4.8, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Check local schedule for free symphony concerts inside.", desc: "Opulent 1896 Renaissance opera house built during the rubber boom." },
+                    { id: 803, name: "MUSA - Amazonian Museum Canopy Tower", price: 40.00, priceTag: "R$ 40,00", rating: 4.8, image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", tip: "Climb the 42-meter steel tower for treetop forest canopy views.", desc: "Living jungle museum set inside Adolpho Ducke Forest Reserve." },
+                    { id: 804, name: "Anavilhanas Archipelago Boat Trip", price: 350.00, priceTag: "R$ 350,00", rating: 4.9, image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80", tip: "One of the world's largest freshwater river archipelagos.", desc: "Over 400 islands covered in flooded Amazonian rainforest." },
+                    { id: 805, name: "Ponta Negra Beach Waterfront", price: 0, priceTag: "FREE", rating: 4.6, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Vibrant river beach promenade with night food stalls.", desc: "Riverfront promenade along the Rio Negro." },
+                    { id: 806, name: "Adolpho Lisboa Municipal Market", price: 0, priceTag: "FREE", rating: 4.6, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", tip: "Buy authentic Amazonian herbs, guarana powder, and handicraft souvenirs.", desc: "Wrought-iron market built in 1882 modeled after Les Halles in Paris." }
+                ]
+            },
+
+            // --- AMERICAS ---
+            "Buenos Aires": {
+                name: "Buenos Aires (Argentina)",
+                region: "americas",
+                distanceKm: 1040,
+                flightDuration: "1h 45m (Direct POA)",
+                transports: [
+                    { type: "Direct Flight", price: 1050.00, details: "Direct flight departing Porto Alegre (POA). Round-trip.", icon: "fa-plane" },
+                    { type: "Personal Car", price: 950.00, details: "1,040 km via border crossing. Requires Green Card insurance.", icon: "fa-car" },
+                    { type: "Sleeper Bus", price: 450.00, details: "International bus departing POA or Uruguaiana (~18h).", icon: "fa-bus" }
+                ],
+                attractions: [
+                    { id: 901, name: "Plaza de Mayo & Casa Rosada", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=800&q=80", tip: "Walk along 9 de Julio Avenue and see the Obelisco.", desc: "The political and historical core of Argentina." },
+                    { id: 902, name: "Caminito & San Telmo Market", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Visit San Telmo on Sunday for street tango and antique markets.", desc: "Vibrant cobblestone street museum with tango street performers." },
+                    { id: 903, name: "Recoleta Cemetery Tour", price: 35.00, priceTag: "R$ 35,00", rating: 4.8, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Locate Eva Perón's (Evita) family mausoleum.", desc: "World famous cemetery filled with marble statues and mausoleums." },
+                    { id: 904, name: "El Ateneo Grand Splendid Bookstore", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "Have a coffee on the former theater stage surrounded by books.", desc: "Housed in a 1919 theater named one of the world's most beautiful bookstores." },
+                    { id: 905, name: "Puerto Madero & Woman's Bridge (Puente de la Mujer)", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Top waterfront neighborhood for steakhouse dining.", desc: "Modernized dockside district featuring Santiago Calatrava bridge." },
+                    { id: 906, name: "Teatro Colón Guided Tour", price: 95.00, priceTag: "R$ 95,00", rating: 4.9, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Acclaimed as having one of the top 5 opera acoustics in the world.", desc: "Opulent 1908 opera house with grand gilded halls." }
+                ]
+            },
+            "Cusco": {
+                name: "Cusco & Machu Picchu (Peru)",
+                region: "americas",
+                distanceKm: 3200,
+                flightDuration: "6h 30m (POA via LIM)",
+                transports: [
+                    { type: "International Flight", price: 2350.00, details: "Flight departing POA via Lima to Cusco (CUZ).", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1001, name: "Machu Picchu Citadel Entrance", price: 280.00, priceTag: "R$ 280,00", rating: 5.0, image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80", tip: "Book entrance tickets 3-4 months in advance due to strict daily quotas.", desc: "Incan citadel set high in the Andes mountains." },
+                    { id: 1002, name: "Cusco Main Plaza (Plaza de Armas)", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=800&q=80", tip: "Drink coca tea to ease altitude acclimatization.", desc: "Colonial city center built over ancient Incan palace foundations." },
+                    { id: 1003, name: "Sacsayhuamán Incan Fortress", price: 110.00, priceTag: "R$ 110,00", rating: 4.8, image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80", tip: "Included in the Cusco Tourist Ticket (Boleto Turístico).", desc: "Megalithic citadel constructed with fitted stones weighing over 120 tons." },
+                    { id: 1004, name: "San Pedro Market", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", tip: "Try local Andean cheese, fruit juices, and roasted corn.", desc: "Bustling central market designed by Gustave Eiffel." },
+                    { id: 1005, name: "Qorikancha (Temple of the Sun)", price: 25.00, priceTag: "R$ 25,00", rating: 4.8, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Notice how Spanish church walls were built directly atop Incan stone foundations.", desc: "Most important sacred temple in the Inca Empire." },
+                    { id: 1006, name: "Rainbow Mountain (Vinicunca) Day Trip", price: 180.00, priceTag: "R$ 180,00", rating: 4.8, image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", tip: "Hike reaches 5,200m elevation; schedule on your 3rd day in Cusco.", desc: "Vibrant multi-colored mineral mountain in the Peruvian Andes." }
+                ]
+            },
+            "Santiago": {
+                name: "Santiago (Chile)",
+                region: "americas",
+                distanceKm: 2200,
+                flightDuration: "3h 20m (POA direct)",
+                transports: [
+                    { type: "Direct Flight", price: 1120.00, details: "Direct flight departing Porto Alegre (POA).", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1101, name: "San Cristóbal Hill & Cable Car", price: 45.00, priceTag: "R$ 45,00", rating: 4.8, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Provides unobstructed views of the Andes mountain range.", desc: "Second highest point in Santiago with parklands and cable car rides." },
+                    { id: 1102, name: "Sky Costanera Observation Deck", price: 95.00, priceTag: "R$ 95,00", rating: 4.7, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "Visit 1 hour before sunset to see city lights against snowpeaks.", desc: "Tallest skyscraper in South America offering 360-degree glass views." },
+                    { id: 1103, name: "Santa Lucía Hill (Cerro Santa Lucía)", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=800&q=80", tip: "Climb to Neptune Fountain at the top for city garden views.", desc: "Ornamental hilltop park where Santiago was originally founded in 1541." },
+                    { id: 1104, name: "La Moneda Palace & Cultural Center", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=800&q=80", tip: "Guard changing ceremony occurs every alternate day at 10:00 AM.", desc: "Neoclassical presidential palace with underground art galleries." },
+                    { id: 1105, name: "Concha y Toro Winery Tour", price: 160.00, priceTag: "R$ 160,00", rating: 4.8, image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80", tip: "Includes wine tastings and entrance to the famous Casillero del Diablo cellar.", desc: "Historic vineyard in the Maipo Valley." },
+                    { id: 1106, name: "Valparaíso & Viña del Mar Day Trip", price: 190.00, priceTag: "R$ 190,00", rating: 4.7, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Ride historic wooden funiculars up colorful hillside street art neighborhoods.", desc: "Coastal UNESCO port city famous for steep funicular railways and mural art." }
+                ]
+            },
+            "New York": {
+                name: "New York City (USA)",
+                region: "americas",
+                distanceKm: 7680,
+                flightDuration: "11h 30m (via GRU)",
+                transports: [
+                    { type: "International Flight", price: 3980.00, details: "Departing POA via Sao Paulo. Round-trip ticket.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1201, name: "Central Park Walk", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Visit Bethesda Terrace and Strawberry Fields.", desc: "Massive urban oasis in the heart of Manhattan." },
+                    { id: 1202, name: "Statue of Liberty & Ellis Island Ferry", price: 135.00, priceTag: "R$ 135,00", rating: 4.8, image: "https://images.unsplash.com/photo-1605130284535-11dd9edc58e1?auto=format&fit=crop&w=800&q=80", tip: "Staten Island Ferry provides a great free distant view.", desc: "America's iconic monument of freedom on Liberty Island." },
+                    { id: 1203, name: "Times Square & Broadway Night Lights", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", tip: "Visit TKTS booth under red steps for discount same-day Broadway tickets.", desc: "Neon-lit intersection known as the Crossroads of the World." },
+                    { id: 1204, name: "Empire State Building Observatory", price: 240.00, priceTag: "R$ 240,00", rating: 4.8, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "Go early morning or late night to bypass security lines.", desc: "World-famous 102-story art deco skyscraper." },
+                    { id: 1205, name: "Brooklyn Bridge Pedestrian Walkway", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Walk from Brooklyn towards Manhattan at sunset for the skyline skyline.", desc: "Historic suspension bridge connecting Manhattan and Brooklyn." },
+                    { id: 1206, name: "High Line Elevated Park & Hudson Yards", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Walk through converted railway line ending at Vessel structure.", desc: "1.45-mile elevated linear park built on former freight rail lines." }
+                ]
+            },
+            "Orlando": {
+                name: "Orlando - Theme Parks (USA)",
+                region: "americas",
+                distanceKm: 6800,
+                flightDuration: "10h 15m (via GRU)",
+                transports: [
+                    { type: "International Flight", price: 3650.00, details: "Departing POA via GRU or Miami.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1301, name: "Magic Kingdom Theme Park Ticket", price: 790.00, priceTag: "R$ 790,00", rating: 4.9, image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", tip: "Use the My Disney Experience app to reserve lightning lanes.", desc: "World famous Cinderella Castle and classic Disney attractions." },
+                    { id: 1302, name: "Universal Studios & Harry Potter World", price: 740.00, priceTag: "R$ 740,00", rating: 4.9, image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", tip: "Park-to-Park ticket required to ride the Hogwarts Express train.", desc: "Immersive film studio theme park with Diagon Alley and rides." },
+                    { id: 1303, name: "Epcot World Showcase", price: 720.00, priceTag: "R$ 720,00", rating: 4.8, image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", tip: "Sample international food and wine booths in 11 country pavilions.", desc: "Futuristic spaces, Guardians of the Galaxy ride, and global cultures." },
+                    { id: 1304, name: "Disney Springs Entertainment Complex", price: 0, priceTag: "FREE Entry", rating: 4.8, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Free parking and entrance; great night atmosphere with live music.", desc: "Open-air dining, shopping, and entertainment waterfront district." },
+                    { id: 1305, name: "Lake Eola Park in Downtown Orlando", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Rent swan paddle boats or visit Sunday farmers market.", desc: "Downtown park with swan-filled lake and fountain backdrop." },
+                    { id: 1306, name: "ICON Park & The Wheel Sky View", price: 150.00, priceTag: "R$ 150,00", rating: 4.6, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "Features 400-foot observation wheel, aquarium, and Madame Tussauds.", desc: "Entertainment complex located on International Drive." }
+                ]
+            },
+
+            // --- EUROPE ---
+            "Paris": {
+                name: "Paris (France)",
+                region: "europe",
+                distanceKm: 9850,
+                flightDuration: "13h 30m (1 stop via GRU)",
+                transports: [
+                    { type: "International Flight", price: 4350.00, details: "Departing POA with 1 connection in Sao Paulo or Lisbon. Round-trip.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1401, name: "Eiffel Tower Summit Access", price: 160.00, priceTag: "R$ 160,00", rating: 4.9, image: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=800&q=80", tip: "Panoramic view from Trocadéro gardens is 100% free.", desc: "The iconic symbol of Paris offering views across the Seine." },
+                    { id: 1402, name: "Louvre Museum Entry", price: 125.00, priceTag: "R$ 125,00", rating: 4.9, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Enter via Carrousel du Louvre underground entrance to skip pyramid lines.", desc: "Home to the Mona Lisa and Venus de Milo." },
+                    { id: 1403, name: "Montmartre & Sacré-Cœur Basilica", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Sit on the basilica steps at sunset for acoustic music and city views.", desc: "Historic hilltop bohemian district famous for artists and churches." },
+                    { id: 1404, name: "Arc de Triomphe Rooftop", price: 85.00, priceTag: "R$ 85,00", rating: 4.8, image: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=800&q=80", tip: "Walk down the Champs-Élysées after climbing to the roof.", desc: "Triumphal arch at the top of Champs-Élysées built by Napoleon." },
+                    { id: 1405, name: "Seine River Evening Cruise", price: 95.00, priceTag: "R$ 95,00", rating: 4.8, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Boat rides pass illuminated monuments at night.", desc: "Glide past Notre-Dame, Musée d'Orsay, and sparkling Eiffel Tower." },
+                    { id: 1406, name: "Tuileries & Luxembourg Gardens", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Grab a green metal chair and relax by the central fountains.", desc: "French formal gardens filled with statues, fountains, and grand palaces." },
+                    { id: 1407, name: "Musée d'Orsay (Impressionist Art)", price: 95.00, priceTag: "R$ 95,00", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "See masterpieces by Monet, Van Gogh, and Renoir inside a former railway station.", desc: "World famous museum housing Impressionist art collections." }
+                ]
+            },
+            "Rome": {
+                name: "Rome (Italy)",
+                region: "europe",
+                distanceKm: 10100,
+                flightDuration: "14h 00m (1 stop)",
+                transports: [
+                    { type: "International Flight", price: 4600.00, details: "Departing POA with 1 connection. Round-trip ticket.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1501, name: "Colosseum & Roman Forum", price: 110.00, priceTag: "R$ 110,00", rating: 4.9, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", tip: "Free admission on the 1st Sunday of every month.", desc: "The largest ancient amphitheatre ever built." },
+                    { id: 1502, name: "Trevi Fountain & Spanish Steps", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1525874684015-5837e7168b0b?auto=format&fit=crop&w=800&q=80", tip: "Toss a coin over your left shoulder to ensure a return to Rome.", desc: "Stunning Baroque fountain and landmark." },
+                    { id: 1503, name: "Pantheon Temple Entry", price: 30.00, priceTag: "R$ 30,00", rating: 4.9, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", tip: "Look up at the central oculus dome opening in the ceiling.", desc: "Best-preserved ancient Roman building with unreinforced concrete dome." },
+                    { id: 1504, name: "Vatican Museums & Sistine Chapel", price: 160.00, priceTag: "R$ 160,00", rating: 4.9, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Book skip-the-line tickets 2 months in advance online.", desc: "Michelangelo's Sistine Chapel ceiling and Papal art collections." },
+                    { id: 1505, name: "St. Peter's Basilica Dome Climb", price: 60.00, priceTag: "R$ 60,00", rating: 4.9, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Church entry is free; dome climb ticket gives views of Rome.", desc: "Largest church in Christendom located inside Vatican City." },
+                    { id: 1506, name: "Piazza Navona & Campo de' Fiori", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1525874684015-5837e7168b0b?auto=format&fit=crop&w=800&q=80", tip: "Great spot for evening gelato and street musicians by Bernini's fountains.", desc: "Baroque public square built over ancient Stadium of Domitian." }
+                ]
+            },
+            "London": {
+                name: "London (United Kingdom)",
+                region: "europe",
+                distanceKm: 9400,
+                flightDuration: "12h 45m (via LIS/GRU)",
+                transports: [
+                    { type: "International Flight", price: 4200.00, details: "Departing POA with 1 layover. Round-trip ticket.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1601, name: "British Museum", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "Book a free timed entry ticket online in advance.", desc: "World-class museum housing the Rosetta Stone and Egyptian mummies." },
+                    { id: 1602, name: "Big Ben & Houses of Parliament", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80", tip: "Cross Westminster Bridge for photos with red telephone boxes.", desc: "Iconic clock tower and Gothic Parliament along River Thames." },
+                    { id: 1603, name: "Tower Bridge & Tower of London", price: 180.00, priceTag: "R$ 180,00", rating: 4.8, image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80", tip: "Walk across glass floor walkway on Tower Bridge upper deck.", desc: "Medieval fortress housing Crown Jewels next to iconic bascule bridge." },
+                    { id: 1604, name: "London Eye Observation Wheel", price: 195.00, priceTag: "R$ 195,00", rating: 4.7, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "30-minute rotation over Thames riverfront.", desc: "Giant cantilevered observation wheel on the South Bank." },
+                    { id: 1605, name: "Hyde Park & Kensington Gardens", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80", tip: "Visit Speaker's Corner or rent a rowboat on the Serpentine Lake.", desc: "One of London's 8 Royal Parks covering 350 acres." },
+                    { id: 1606, name: "Natural History Museum", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "See the blue whale skeleton hanging in Hintze Hall.", desc: "World famous museum with dinosaur galleries and Romanesque cathedral architecture." }
+                ]
+            },
+            "Barcelona": {
+                name: "Barcelona (Spain)",
+                region: "europe",
+                distanceKm: 9200,
+                flightDuration: "13h 00m (via MAD)",
+                transports: [
+                    { type: "International Flight", price: 4100.00, details: "Departing POA via Madrid or Lisbon.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1701, name: "Sagrada Família Basilica", price: 145.00, priceTag: "R$ 145,00", rating: 4.9, image: "https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=800&q=80", tip: "Visit late afternoon to see stained glass sunlight reflections.", desc: "Antoni Gaudí's unfinished architectural masterpiece." },
+                    { id: 1702, name: "Park Güell Monumental Zone", price: 60.00, priceTag: "R$ 60,00", rating: 4.8, image: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=800&q=80", tip: "The outer forest trails of the park are completely free to walk.", desc: "Whimsical mosaic park overlooking Barcelona and the Mediterranean." },
+                    { id: 1703, name: "Gothic Quarter & Barcelona Cathedral", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Explore labyrinth cobblestone alleyways and hidden tapas squares.", desc: "Historic center of Barcelona with medieval Roman wall remains." },
+                    { id: 1704, name: "La Rambla & La Boqueria Market", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", tip: "Buy fresh fruit juices and Iberian ham cones inside Boqueria.", desc: "Famous boulevard stretching from Plaza Catalunya to Christopher Columbus monument." },
+                    { id: 1705, name: "Barceloneta Beach Promenade", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", tip: "Rent a bicycle or enjoy seafood paella at beachfront xiringuitos.", desc: "Bustling Mediterranean urban beach lined with palm boardwalks." },
+                    { id: 1706, name: "Casa Batlló (Gaudí Architecture)", price: 180.00, priceTag: "R$ 180,00", rating: 4.8, image: "https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=800&q=80", tip: "Audio guide includes augmented reality features.", desc: "Renovated Gaudí residential building with dragon-back tile roof." }
+                ]
+            },
+            "Lisbon": {
+                name: "Lisbon (Portugal)",
+                region: "europe",
+                distanceKm: 8500,
+                flightDuration: "10h 30m (Direct TAP from POA)",
+                transports: [
+                    { type: "Direct International Flight", price: 3850.00, details: "Direct TAP flight from Porto Alegre airport (POA).", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1801, name: "Belém Tower & Jerónimos Monastery", price: 60.00, priceTag: "R$ 60,00", rating: 4.8, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", tip: "Don't miss authentic Pastéis de Belém near the monastery.", desc: "Manueline architecture celebrating Portugal's Age of Discovery." },
+                    { id: 1802, name: "Tram 28 & Alfama District Walk", price: 18.00, priceTag: "R$ 18,00", rating: 4.8, image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=800&q=80", tip: "Board at Martim Moniz station early morning to secure a window seat.", desc: "Classic yellow vintage tram winding through steep medieval alleys." },
+                    { id: 1803, name: "São Jorge Castle (Castelo de S. Jorge)", price: 80.00, priceTag: "R$ 80,00", rating: 4.7, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Walk along ramparts for panoramic views over Tagus River.", desc: "Moorish hilltop castle overlooking Lisbon red-tile roofs." },
+                    { id: 1804, name: "Miradouro de Santa Luzia & Senhora do Monte", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Best spots in Lisbon to catch acoustic fado singers at sunset.", desc: "Terraced viewpoints adorned with blue azulejo tile walls." },
+                    { id: 1805, name: "Sintra Pena Palace Day Trip", price: 90.00, priceTag: "R$ 90,00", rating: 4.9, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", tip: "Take 40-minute train from Rossio station directly to Sintra.", desc: "Vibrant yellow and red Romanticist castle in Sintra hills." },
+                    { id: 1806, name: "LX Factory Cultural Village", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80", tip: "Visit Ler Devagar bookstore and industrial roof bars.", desc: "Converted 1846 textile factory complex full of design shops and cafes." }
+                ]
+            },
+
+            // --- ASIA & AFRICA ---
+            "Tokyo": {
+                name: "Tokyo (Japan)",
+                region: "asia-africa",
+                distanceKm: 18400,
+                flightDuration: "26h 00m (via Qatar/USA)",
+                transports: [
+                    { type: "Long-Haul Flight", price: 7800.00, details: "Departing POA via Qatar or USA connections. Round-trip.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 1901, name: "Senso-ji Temple in Asakusa", price: 0, priceTag: "FREE", rating: 4.9, image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80", tip: "Visit at dusk when traditional red lanterns light up.", desc: "Tokyo's oldest and most significant Buddhist temple." },
+                    { id: 1902, name: "Shibuya Crossing & Hachiko Statue", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80", tip: "Get a top view of the scramble from Shibuya Sky balcony.", desc: "The world's busiest pedestrian intersection." },
+                    { id: 1903, name: "teamLab Planets Immersive Digital Art", price: 160.00, priceTag: "R$ 160,00", rating: 4.9, image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80", tip: "Walk barefoot through knee-deep water digital light rooms.", desc: "World famous interactive museum where visitors walk through digital art projection rooms." },
+                    { id: 1904, name: "Meiji Shrine & Yoyogi Park", price: 0, priceTag: "FREE", rating: 4.8, image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80", tip: "Pass through huge wooden Torii gates in Harajuku.", desc: "Quiet Shinto shrine surrounded by 170-acre forest in central Tokyo." },
+                    { id: 1905, name: "Akihabara Electric Town", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", tip: "Explore multi-story retro video game arcades like Super Potato.", desc: "Otaku culture center filled with electronics, anime, and manga shops." },
+                    { id: 1906, name: "Tokyo Skytree Observatory", price: 110.00, priceTag: "R$ 110,00", rating: 4.8, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80", tip: "On clear days you can spot Mount Fuji on the horizon.", desc: "Tallest structure in Japan standing 634 meters high." }
+                ]
+            },
+            "Cairo": {
+                name: "Cairo & Pyramids (Egypt)",
+                region: "asia-africa",
+                distanceKm: 10800,
+                flightDuration: "16h 00m (1 stop)",
+                transports: [
+                    { type: "International Flight", price: 5400.00, details: "Departing POA via GRU and Dubai or Cairo.", icon: "fa-plane" }
+                ],
+                attractions: [
+                    { id: 2001, name: "Giza Plateau Pyramids & Sphinx", price: 120.00, priceTag: "R$ 120,00", rating: 4.9, image: "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?auto=format&fit=crop&w=800&q=80", tip: "Camel rides should be negotiated firmly before mounting.", desc: "The Great Pyramid of Khufu and Great Sphinx of Giza." },
+                    { id: 2002, name: "Grand Egyptian Museum (GEM)", price: 110.00, priceTag: "R$ 110,00", rating: 4.9, image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80", tip: "Houses the complete Tutankhamun golden treasure collection.", desc: "Largest archaeological museum complex in the world." },
+                    { id: 2003, name: "Khan el-Khalili Bazaar", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", tip: "Sip mint tea at historic El Fishawy cafe founded in 1797.", desc: "Famous medieval souk bazaar in Islamic Cairo." },
+                    { id: 2004, name: "Citadel of Saladin & Mosque of Muhammad Ali", price: 50.00, priceTag: "R$ 50,00", rating: 4.8, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Offers sweeping vistas across Cairo skyline all the way to the Pyramids.", desc: "Islamic fortification built on Mokattam Hill." },
+                    { id: 2005, name: "Nile River Felucca Sunset Sail", price: 80.00, priceTag: "R$ 80,00", rating: 4.8, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80", tip: "Rent a private traditional wooden sailboat for 1 hour at dusk.", desc: "Relaxing wooden sailboat cruise on the world's longest river." },
+                    { id: 2006, name: "Coptic Cairo & Hanging Church", price: 0, priceTag: "FREE", rating: 4.7, image: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80", tip: "Visit St. Sergius church cavern where Holy Family hid.", desc: "Historic Christian quarter built above Roman fortress gatehouse." }
+                ]
+            }
+        };
+
+        let selectedAttractions = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateDestinationDropdown();
+            onDestinationChange();
+        });
+
+        function populateDestinationDropdown() {
+            const select = document.getElementById('select-destination');
+            select.innerHTML = '';
+
+            const keys = Object.keys(destinationsData);
+            
+            keys.forEach(key => {
+                const dest = destinationsData[key];
+                
+                if (activeRegionFilter !== 'all' && dest.region !== activeRegionFilter) {
+                    return;
+                }
+
+                if (searchQuery.trim() !== '') {
+                    const q = searchQuery.toLowerCase();
+                    const nameMatch = dest.name.toLowerCase().includes(q);
+                    const attractionMatch = dest.attractions.some(a => a.name.toLowerCase().includes(q));
+                    if (!nameMatch && !attractionMatch) return;
+                }
+
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = `${dest.name} (${dest.attractions.length} spots)`;
+                select.appendChild(opt);
+            });
+
+            if (select.options.length > 0) {
+                select.selectedIndex = 0;
+                selectedDestinationKey = select.value;
+            }
+        }
+
+        function setRegionFilter(region) {
+            activeRegionFilter = region;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.region === region) {
+                    btn.className = "filter-btn active text-xs font-bold px-3 py-1.5 rounded-xl border bg-brand-600 text-white border-brand-600";
+                } else {
+                    btn.className = "filter-btn text-xs font-bold px-3 py-1.5 rounded-xl border bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200";
+                }
+            });
+
+            populateDestinationDropdown();
+            onDestinationChange();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value;
+            populateDestinationDropdown();
+            onDestinationChange();
+        }
+
+        function onDestinationChange() {
+            const select = document.getElementById('select-destination');
+            if (!select.value) {
+                document.getElementById('dist-display').innerText = "No destination matching filter";
+                document.getElementById('transport-cards').innerHTML = '<p class="text-slate-500 text-sm italic col-span-3">No destinations found for this filter. Try clearing your search.</p>';
+                document.getElementById('attractions-grid').innerHTML = '';
+                return;
+            }
+
+            selectedDestinationKey = select.value;
+            const dest = destinationsData[selectedDestinationKey];
+
+            document.getElementById('dist-display').innerText = `${dest.distanceKm.toLocaleString('pt-BR')} km (${currentOrigin} ➔ ${dest.name})`;
+            document.getElementById('flight-duration-display').innerText = dest.flightDuration;
+            document.getElementById('active-city-title').innerText = dest.name;
+            document.getElementById('spots-count-badge').innerText = `${dest.attractions.length} Tourist Spots Available`;
+
+            selectedTransportIndex = 0; 
+            renderTransportOptions();
+            renderAttractions();
+            recalculateTripTotal();
+        }
+
+        function detectUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentOrigin = "GPS Location";
+                        document.getElementById('user-origin').value = currentOrigin;
+                        document.getElementById('origin-badge').innerHTML = `<i class="fa-solid fa-location-dot text-brand-600"></i> GPS Location acquired.`;
+                        updateOriginLabels();
+                    },
+                    (error) => {
+                        currentOrigin = "Lajeado, RS, Brazil";
+                        document.getElementById('user-origin').value = currentOrigin;
+                        alert("Could not retrieve GPS location. Keeping default origin in Lajeado, RS.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        function updateOriginLabels() {
+            currentOrigin = document.getElementById('user-origin').value || "Lajeado, RS";
+            document.getElementById('origin-display-text').innerText = `${currentOrigin} (Active Route Origin)`;
+            document.getElementById('current-origin-label').innerText = currentOrigin;
+            document.getElementById('calc-origin-name').innerText = currentOrigin;
+            document.getElementById('drawer-origin-subtitle').innerText = `Origin: ${currentOrigin}`;
+            onDestinationChange();
+        }
+
+        function renderTransportOptions() {
+            const dest = destinationsData[selectedDestinationKey];
+            if (!dest) return;
+            
+            const container = document.getElementById('transport-cards');
+
+            container.innerHTML = dest.transports.map((t, idx) => {
+                const isSelected = selectedTransportIndex === idx;
+                return `
+                    <div onclick="selectTransport(${idx})" class="cursor-pointer p-5 rounded-2xl border ${isSelected ? 'bg-brand-50 border-brand-500 ring-2 ring-brand-500' : 'bg-white border-slate-200 hover:border-brand-300'} transition shadow-sm flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div class="w-10 h-10 ${isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700'} rounded-xl flex items-center justify-center text-lg">
+                                    <i class="fa-solid ${t.icon}"></i>
+                                </div>
+                                ${isSelected ? '<span class="bg-brand-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Selected</span>' : ''}
+                            </div>
+                            <h3 class="font-bold text-base text-slate-900">${t.type}</h3>
+                            <p class="text-slate-600 text-xs">${t.details}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Est. Round-Trip Fare</span>
+                            <span class="text-xl font-extrabold text-brand-700">${formatBRL(t.price)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateDrawerTransport();
+        }
+
+        function selectTransport(index) {
+            selectedTransportIndex = index;
+            renderTransportOptions();
+            recalculateTripTotal();
+        }
+
+        function updateDrawerTransport() {
+            const dest = destinationsData[selectedDestinationKey];
+            if (!dest) return;
+            const t = dest.transports[selectedTransportIndex];
+            document.getElementById('drawer-transport-item').innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-900 block">${t.type}</span>
+                        <span class="text-[10px] text-slate-500">${dest.name}</span>
+                    </div>
+                    <span class="font-extrabold text-brand-700 text-sm">${formatBRL(t.price)}</span>
+                </div>
+            `;
+        }
+
+        function renderAttractions() {
+            const dest = destinationsData[selectedDestinationKey];
+            if (!dest) return;
+
+            const priceFilter = document.getElementById('filter-price-type').value;
+            const spotQuery = (document.getElementById('spot-search')?.value || '').toLowerCase();
+            const container = document.getElementById('attractions-grid');
+
+            let filtered = dest.attractions;
+
+            if (priceFilter === 'free') filtered = filtered.filter(a => a.price === 0);
+            if (priceFilter === 'budget') filtered = filtered.filter(a => a.price <= 100 && a.price > 0);
+            if (priceFilter === 'premium') filtered = filtered.filter(a => a.price > 100);
+
+            if (spotQuery.trim() !== '') {
+                filtered = filtered.filter(a => a.name.toLowerCase().includes(spotQuery) || a.desc.toLowerCase().includes(spotQuery));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200 p-6">
+                        <i class="fa-solid fa-compass text-4xl text-slate-300 mb-2"></i>
+                        <p class="font-bold text-slate-700">No tourist spots found matching this filter.</p>
+                        <p class="text-xs text-slate-500">Try clearing your search input or switching price options.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(a => {
+                const isAdded = selectedAttractions.some(item => item.id === a.id);
+                return `
+                    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-44">
+                                <img src="${a.image}" alt="${a.name}" class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 ${a.price === 0 ? 'bg-emerald-500' : 'bg-slate-900/80'} text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm">
+                                    ${a.priceTag}
+                                </span>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-slate-900 text-sm leading-snug">${a.name}</h4>
+                                    <span class="text-amber-500 text-xs font-bold shrink-0 ml-1"><i class="fa-solid fa-star"></i> ${a.rating}</span>
+                                </div>
+                                <p class="text-slate-600 text-xs line-clamp-2">${a.desc}</p>
+                                <div class="bg-amber-50 p-2 rounded-lg text-[11px] text-amber-900 border border-amber-200/60">
+                                    <i class="fa-solid fa-lightbulb text-amber-500"></i> ${a.tip}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 pt-0 border-t border-slate-100 mt-2 flex justify-between items-center">
+                            <span class="font-extrabold text-sm text-slate-900">${a.priceTag}</span>
+                            <button onclick="toggleAttraction(${a.id})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${isAdded ? 'bg-accent-500 hover:bg-accent-600 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white'}">
+                                <i class="fa-solid ${isAdded ? 'fa-check' : 'fa-plus'}"></i>
+                                ${isAdded ? 'Added' : 'Add Ticket'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleAttraction(id) {
+            const dest = destinationsData[selectedDestinationKey];
+            const item = dest.attractions.find(a => a.id === id);
+            if (!item) return;
+
+            const existsIndex = selectedAttractions.findIndex(a => a.id === id);
+            if (existsIndex > -1) {
+                selectedAttractions.splice(existsIndex, 1);
+            } else {
+                selectedAttractions.push(item);
+            }
+
+            renderAttractions();
+            updateCartDrawerUI();
+            recalculateTripTotal();
+        }
+
+        function clearCartAttractions() {
+            selectedAttractions = [];
+            renderAttractions();
+            updateCartDrawerUI();
+            recalculateTripTotal();
+        }
+
+        function recalculateTripTotal() {
+            const dest = destinationsData[selectedDestinationKey];
+            if (!dest) return;
+
+            const transportPrice = dest.transports[selectedTransportIndex].price;
+            
+            const days = parseInt(document.getElementById('trip-days').value) || 1;
+            const hotelRate = parseFloat(document.getElementById('hotel-rate').value) || 0;
+            const foodRate = parseFloat(document.getElementById('food-rate').value) || 0;
+
+            const attractionsPrice = selectedAttractions.reduce((sum, a) => sum + a.price, 0);
+            const stayTotal = (hotelRate + foodRate) * days;
+            const grandTotal = transportPrice + attractionsPrice + stayTotal;
+
+            document.getElementById('summary-transport').innerText = formatBRL(transportPrice);
+            document.getElementById('summary-attractions').innerText = formatBRL(attractionsPrice);
+            document.getElementById('summary-hotel').innerText = formatBRL(hotelRate * days);
+            document.getElementById('summary-food').innerText = formatBRL(foodRate * days);
+            document.getElementById('calc-grand-total').innerText = formatBRL(grandTotal);
+
+            document.getElementById('drawer-cost-transport').innerText = formatBRL(transportPrice);
+            document.getElementById('drawer-cost-attractions').innerText = formatBRL(attractionsPrice);
+            document.getElementById('drawer-cost-stay').innerText = formatBRL(stayTotal);
+            document.getElementById('drawer-cost-total').innerText = formatBRL(grandTotal);
+            document.getElementById('cart-count').innerText = selectedAttractions.length;
+            document.getElementById('cart-item-count').innerText = selectedAttractions.length;
+
+            updateCartDrawerUI();
+        }
+
+        function updateCartDrawerUI() {
+            const container = document.getElementById('cart-items');
+            if (selectedAttractions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 space-y-2">
+                        <i class="fa-solid fa-ticket text-3xl mb-1 text-slate-300"></i>
+                        <p class="font-bold text-xs text-slate-600">No attractions selected.</p>
+                        <p class="text-[11px]">Click 'Add Ticket' on any spot to add it to your itinerary.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = selectedAttractions.map(a => `
+                    <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800 block">${a.name}</span>
+                            <span class="text-brand-700 font-extrabold">${a.priceTag}</span>
+                        </div>
+                        <button onclick="toggleAttraction(${a.id})" class="text-slate-400 hover:text-accent-600 p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleCartDrawer(openForce = null) {
+            const drawer = document.getElementById('cart-drawer');
+            const panel = document.getElementById('cart-panel');
+
+            const isOpen = !drawer.classList.contains('pointer-events-none');
+            const shouldOpen = openForce !== null ? openForce : !isOpen;
+
+            if (shouldOpen) {
+                drawer.classList.remove('pointer-events-none', 'opacity-0');
+                drawer.classList.add('opacity-100');
+                panel.classList.remove('translate-x-full');
+            } else {
+                drawer.classList.add('pointer-events-none', 'opacity-0');
+                drawer.classList.remove('opacity-100');
+                panel.classList.add('translate-x-full');
+            }
+        }
+
+        function openGitHubModal() {
+            document.getElementById('github-modal').classList.remove('hidden');
+        }
+
+        function closeGitHubModal() {
+            document.getElementById('github-modal').classList.add('hidden');
+        }
+
+        function copyItineraryToClipboard() {
+            const dest = destinationsData[selectedDestinationKey];
+            const transport = dest.transports[selectedTransportIndex];
+            const grandTotal = document.getElementById('calc-grand-total').innerText;
+
+            let summary = `=== TRIPCRAFT ITINERARY SUMMARY (BRL) ===\n`;
+            summary += `Origin: ${currentOrigin}\n`;
+            summary += `Destination: ${dest.name} (${dest.distanceKm} km)\n`;
+            summary += `Transport Mode: ${transport.type} (${formatBRL(transport.price)})\n\n`;
+            summary += `Selected Sights (${selectedAttractions.length}):\n`;
+            
+            if (selectedAttractions.length === 0) {
+                summary += `- No individual sight tickets added.\n`;
+            } else {
+                selectedAttractions.forEach(a => {
+                    summary += `- ${a.name} (${a.priceTag})\n`;
+                });
+            }
+
+            summary += `\nESTIMATED GRAND TOTAL: ${grandTotal}\n`;
+            summary += `===================================`;
+
+            const textarea = document.createElement("textarea");
+            textarea.value = summary;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+
+            alert("Itinerary summary copied to clipboard!");
+        }
+
+        function downloadJSON() {
+            const dest = destinationsData[selectedDestinationKey];
+            const transport = dest.transports[selectedTransportIndex];
+            
+            const exportData = {
+                currency: "BRL (R$)",
+                origin: currentOrigin,
+                destination: dest.name,
+                distanceKm: dest.distanceKm,
+                transport: transport,
+                attractions: selectedAttractions,
+                durationDays: parseInt(document.getElementById('trip-days').value),
+                totalEstimatedBudget: document.getElementById('calc-grand-total').innerText,
+                generatedAt: new Date().toISOString()
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `itinerary-${dest.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>
